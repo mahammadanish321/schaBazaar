@@ -285,14 +285,37 @@ export default function AggregatorProductsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="image">Product Image URL</Label>
-                    <Input
-                      id="image"
-                      value={newProduct.image}
-                      onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                      className="input-field"
-                    />
+                      <Label htmlFor="imageUpload">Product Images (max 5)</Label>
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          let currentImages = newProduct.images || [];
+                          // Merge new files with existing images
+                          const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+                          let mergedImages = [...currentImages, ...newImages];
+                          if (mergedImages.length > 5) {
+                            alert('You can upload a maximum of 5 images.');
+                            mergedImages = mergedImages.slice(0, 5);
+                          }
+                          setNewProduct({ ...newProduct, images: mergedImages });
+                        }}
+                        className="input-field"
+                      />
+                      {/* Show previews */}
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                        {newProduct.images && newProduct.images.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img.preview}
+                            alt={`Product Preview ${idx + 1}`}
+                            style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px' }}
+                          />
+                        ))}
+                      </div>
                   </div>
 
                   <div className="flex items-center space-x-2">

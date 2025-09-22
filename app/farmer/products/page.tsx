@@ -38,6 +38,8 @@ import { downloadQRCode } from "@/lib/qr-utils"
 import { useNotifications } from "@/contexts/notification-context"
 
 // Mock farmer products data
+
+// Helper for image preview cleanup
 const mockFarmerProducts = [
   {
     id: 1,
@@ -107,10 +109,17 @@ interface Product {
   category: string
   image: string
   description: string
+  images?: Array<{ file: File; preview: string }>
   organic: boolean
   active: boolean
   qrCode?: string
   hasQR?: boolean
+}
+
+function revokeImagePreviews(images: Array<{ file: File; preview: string }> = []) {
+  images.forEach((img: { file: File; preview: string }) => {
+    if (img.preview) URL.revokeObjectURL(img.preview);
+  });
 }
 
 export default function FarmerProductsPage() {
@@ -134,8 +143,7 @@ export default function FarmerProductsPage() {
 
   // Redirect if not farmer
   if (user && user.userType !== "farmer") {
-    router.push("/")
-    return null
+  router.push("/")
   }
 
   const handleBack = () => {
@@ -339,14 +347,39 @@ export default function FarmerProductsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="image">Product Image URL</Label>
-                    <Input
-                      id="image"
-                      value={newProduct.image}
-                      onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                      className="input-field"
-                    />
+                      <Label htmlFor="imageUpload">Product Images (max 5)</Label>
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          let currentImages = newProduct.images || [];
+                          // Merge new files with existing images
+                          const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+                          let mergedImages = [...currentImages, ...newImages];
+                          if (mergedImages.length > 5) {
+                            alert('You can upload a maximum of 5 images.');
+                            mergedImages = mergedImages.slice(0, 5);
+                          }
+                          // Clean up previous previews only if replaced
+                          revokeImagePreviews(currentImages);
+                          setNewProduct({ ...newProduct, images: mergedImages });
+                        }}
+                        className="input-field"
+                      />
+                      {/* Show previews */}
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                        {newProduct.images && newProduct.images.map((img: { file: File; preview: string }, idx: number) => (
+                          <img
+                            key={idx}
+                            src={img.preview}
+                            alt={`Product Preview ${idx + 1}`}
+                            style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px' }}
+                          />
+                        ))}
+                      </div>
                   </div>
 
                   <div className="flex items-center space-x-2">
