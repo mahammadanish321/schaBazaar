@@ -1,5 +1,8 @@
 "use client"
 import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react"
+import type React from "react"
+import Image from "next/image"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -39,22 +42,33 @@ export function CartSidebar({
 
   if (!isOpen) return null
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-black/50 z-40"
+        onClick={handleBackdropClick}
+        role="button"
+        tabIndex={-1}
+        aria-label="Close cart"
+      />
 
-      {/* Sidebar */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl animate-slide-in-right">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl animate-slide-in-right overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-10">
             <div className="flex items-center gap-2">
               <ShoppingBag className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold text-foreground">My Cart</h2>
               {totalItems > 0 && <Badge className="bg-primary text-primary-foreground font-bold">{totalItems}</Badge>}
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10">
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -73,11 +87,13 @@ export function CartSidebar({
                   <Card key={item.id} className="border-border/50">
                     <CardContent className="p-3">
                       <div className="flex gap-3">
-                        <div className="relative">
-                          <img
-                            src={item.image || "/placeholder.svg"}
+                        <div className="relative flex-shrink-0 w-16 h-16">
+                          <Image
+                            src={item.image || "/placeholder.svg?height=64&width=64"}
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-lg"
+                            fill
+                            className="object-cover rounded-lg"
+                            sizes="64px"
                           />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -93,29 +109,30 @@ export function CartSidebar({
                             </div>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
                               onClick={() => onRemoveItem(item.id)}
-                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive flex-shrink-0"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-                          <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center justify-between mt-3">
                             <div className="flex items-center gap-2">
                               <Button
                                 variant="outline"
-                                size="sm"
+                                size="icon"
                                 onClick={() => onUpdateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                                className="h-6 w-6 p-0 border-muted-foreground/20"
+                                className="h-8 w-8 border-muted-foreground/20"
+                                disabled={item.quantity <= 1}
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="text-sm font-semibold w-8 text-center">{item.quantity}</span>
+                              <span className="text-sm font-semibold w-10 text-center">{item.quantity}</span>
                               <Button
                                 variant="outline"
-                                size="sm"
+                                size="icon"
                                 onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                                className="h-6 w-6 p-0 border-muted-foreground/20"
+                                className="h-8 w-8 border-muted-foreground/20"
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
@@ -135,7 +152,7 @@ export function CartSidebar({
 
           {/* Footer */}
           {cartItems.length > 0 && (
-            <div className="border-t border-border bg-muted/30">
+            <div className="border-t border-border bg-muted/30 sticky bottom-0">
               <div className="p-4 space-y-3">
                 {/* Bill Details */}
                 <div className="space-y-2 text-sm">
@@ -156,7 +173,10 @@ export function CartSidebar({
                   <span className="font-bold text-lg">Total:</span>
                   <span className="font-bold text-xl text-primary">₹{finalTotal.toFixed(2)}</span>
                 </div>
-                <Button className="w-full font-bold text-base py-6 bg-primary hover:bg-primary/90" onClick={onCheckout}>
+                <Button
+                  className="w-full font-bold text-base py-6 bg-primary hover:bg-primary/90 h-12"
+                  onClick={onCheckout}
+                >
                   Proceed to Checkout
                 </Button>
               </div>

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Search, QrCode, Home, Grid3X3, ShoppingCart, User, Plus, MapPin, ChevronDown, Mic, Bell } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
+import { Search, Plus, MapPin, ChevronDown, Mic, Bell, Star, Clock, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -9,11 +9,13 @@ import { ProductCard } from "@/components/product-card"
 import { CartSidebar } from "@/components/cart-sidebar"
 import { QRScanner } from "@/components/qr-scanner"
 import { NotificationPanel } from "@/components/notification-panel"
+import { FloatingNavigation } from "@/components/floating-navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { useCart } from "@/contexts/cart-context"
 import { useNotifications } from "@/contexts/notification-context"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 
 const mockProducts = [
   {
@@ -198,13 +200,18 @@ export default function HomePage() {
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0)
+  const [serviceType, setServiceType] = useState<"quick" | "schedule">("quick")
 
   useEffect(() => {
+    if (!user) {
+      router.push("/get-started")
+      return
+    }
     const interval = setInterval(() => {
       setCurrentOfferIndex((prev) => (prev + 1) % featuredOffers.length)
     }, 4000)
     return () => clearInterval(interval)
-  }, [])
+  }, [user, router])
 
   const handleAddToCart = (product: any) => {
     addToCart(product, product.quantity || 1)
@@ -228,29 +235,48 @@ export default function HomePage() {
     router.push("/checkout")
   }
 
-  const filteredProducts =
-    selectedCategory === "all" ? mockProducts : mockProducts.filter((product) => product.category === selectedCategory)
+  const filteredProducts = useMemo(() => {
+    return selectedCategory === "all"
+      ? mockProducts
+      : mockProducts.filter((product) => product.category === selectedCategory)
+  }, [selectedCategory])
 
-  const totalCartItems = getTotalItems()
+  const totalCartItems = useMemo(() => getTotalItems(), [cartItems])
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      {/* Header with glass effect */}
+      <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl border-b border-border/50">
         <div className="container-max section-padding">
           <div className="flex items-center justify-between py-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-lg font-bold text-foreground">SacchaBazaar</h1>
                 {user && (
-                  <Badge variant="secondary" className="text-xs capitalize">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs capitalize bg-primary/10 text-primary border-primary/20"
+                  >
                     {user.userType}
                   </Badge>
                 )}
               </div>
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">Delivery in 20 minutes</span>
-                <div className="flex items-center gap-1">
+                <span className="font-medium text-foreground">
+                  {serviceType === "quick" ? "Delivery in 20 minutes" : "Schedule your delivery"}
+                </span>
+                <div className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
                   <MapPin className="w-3 h-3" />
                   <span>Baruipur Station Road</span>
                   <ChevronDown className="w-3 h-3" />
@@ -259,9 +285,43 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <div className="flex items-center bg-muted/50 rounded-lg p-1 mr-2">
+                <Button
+                  variant={serviceType === "quick" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setServiceType("quick")}
+                  className={`h-8 px-3 text-xs font-medium transition-all ${
+                    serviceType === "quick"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  }`}
+                >
+                  <Zap className="w-3 h-3 mr-1" />
+                  Quick
+                </Button>
+                <Button
+                  variant={serviceType === "schedule" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setServiceType("schedule")}
+                  className={`h-8 px-3 text-xs font-medium transition-all ${
+                    serviceType === "schedule"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  }`}
+                >
+                  <Clock className="w-3 h-3 mr-1" />
+                  Schedule
+                </Button>
+              </div>
+
               {user ? (
                 <>
-                  <Button size="sm" variant="ghost" className="relative" onClick={() => setIsNotificationOpen(true)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="relative bg-background/50 hover:bg-primary/10 backdrop-blur-sm"
+                    onClick={() => setIsNotificationOpen(true)}
+                  >
                     <Bell className="w-4 h-4" />
                     {unreadCount > 0 && (
                       <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center p-0">
@@ -270,18 +330,25 @@ export default function HomePage() {
                     )}
                   </Button>
                   {user.userType === "farmer" && (
-                    <Button size="sm" variant="outline" onClick={() => router.push("/farmer/products")}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-background/50 backdrop-blur-sm border-border/50 hover:bg-primary/10"
+                      onClick={() => router.push("/farmer/products")}
+                    >
                       <Plus className="w-4 h-4" />
                     </Button>
                   )}
                   {user.userType === "aggregator" && (
-                    <Button size="sm" variant="outline" onClick={() => router.push("/aggregator/products")}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-background/50 backdrop-blur-sm border-border/50 hover:bg-primary/10"
+                      onClick={() => router.push("/aggregator/products")}
+                    >
                       <Plus className="w-4 h-4" />
                     </Button>
                   )}
-                  <Button size="sm" variant="ghost" onClick={() => router.push("/profile")}>
-                    <User className="w-4 h-4" />
-                  </Button>
                 </>
               ) : (
                 <Link href="/auth/login">
@@ -293,24 +360,50 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar with glass effect */}
           <div className="pb-4">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
-                placeholder="Search 'organic vegetables', 'fresh fruits'..."
-                className="input-field h-12 pl-12 pr-12 bg-muted/50"
+                placeholder={`Search ${serviceType === "quick" ? "for instant delivery" : "to schedule later"}...`}
+                className="input-field h-12 pl-12 pr-12 bg-background/50 backdrop-blur-sm border-border/50"
               />
-              <Button size="sm" variant="ghost" className="absolute right-2 top-1/2 -translate-y-1/2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-primary/10"
+              >
                 <Mic className="w-4 h-4 text-muted-foreground" />
               </Button>
             </div>
           </div>
+
+          {/* Service Type Indicator Banner */}
+          {serviceType === "schedule" && (
+            <div className="pb-4">
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Schedule Service Selected</p>
+                  <p className="text-xs text-muted-foreground">Choose your preferred delivery time during checkout</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs border-primary/30 text-primary hover:bg-primary/10 bg-transparent"
+                >
+                  Set Time
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Categories */}
-      <section className="bg-background border-b border-border">
+      {/* Categories with glass effect */}
+      <section className="bg-background/70 backdrop-blur-sm border-b border-border/50">
         <div className="container-max section-padding">
           <div className="flex items-center gap-6 py-4 overflow-x-auto scrollbar-hide">
             {categories.map((category) => (
@@ -322,8 +415,10 @@ export default function HomePage() {
                 }`}
               >
                 <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-200 ${
-                    selectedCategory === category.id ? "bg-primary/10 scale-110" : "bg-muted/50 hover:bg-muted"
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all duration-200 backdrop-blur-sm ${
+                    selectedCategory === category.id
+                      ? "bg-primary/20 scale-110 border border-primary/30"
+                      : "bg-background/50 hover:bg-background/80 border border-border/30"
                   }`}
                 >
                   {category.icon}
@@ -336,20 +431,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Banner */}
+      {/* Featured Banner with enhanced glass effect */}
       <section className="section-padding py-6">
         <div className="container-max">
           <div className="relative h-48 md:h-56 lg:h-64 rounded-2xl overflow-hidden">
             <div className={`absolute inset-0 bg-gradient-to-r ${featuredOffers[currentOfferIndex].color}`}>
-              <img
-                src={featuredOffers[currentOfferIndex].image || "/placeholder.svg"}
+              <Image
+                src={featuredOffers[currentOfferIndex].image || "/placeholder.svg?height=400&width=800"}
                 alt={featuredOffers[currentOfferIndex].title}
-                className="w-full h-full object-cover opacity-20"
+                fill
+                className="object-cover opacity-20"
+                sizes="(max-width: 768px) 100vw, 800px"
+                priority={true}
               />
             </div>
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
             <div className="relative z-10 p-6 h-full flex flex-col justify-center text-white">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">
+                <span className="text-xs font-bold bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
                   {featuredOffers[currentOfferIndex].subtitle}
                 </span>
               </div>
@@ -361,8 +460,8 @@ export default function HomePage() {
               {featuredOffers.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentOfferIndex ? "bg-white w-6" : "bg-white/50"
+                  className={`h-2 rounded-full transition-all duration-300 backdrop-blur-sm ${
+                    index === currentOfferIndex ? "bg-white w-6" : "bg-white/50 w-2"
                   }`}
                 />
               ))}
@@ -371,22 +470,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quick Categories Grid */}
+      {/* Quick Categories Grid with glass cards */}
       <section className="section-padding py-6">
         <div className="container-max">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickCategories.map((category) => (
               <div
                 key={category.id}
-                className={`relative h-32 md:h-36 rounded-2xl overflow-hidden cursor-pointer group transition-transform duration-200 hover:scale-105`}
+                className={`relative h-32 md:h-36 rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:scale-105 border border-border/30`}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${category.color}`}>
-                  <img
-                    src={category.image || "/placeholder.svg"}
+                  <Image
+                    src={category.image || "/placeholder.svg?height=200&width=300"}
                     alt={category.title}
-                    className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
+                    fill
+                    className="object-cover opacity-30 group-hover:opacity-40 transition-opacity"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                   />
                 </div>
+                <div className="absolute inset-0 bg-black/10 backdrop-blur-[0.5px] group-hover:backdrop-blur-[1px] transition-all" />
                 <div className="relative z-10 p-4 h-full flex flex-col justify-end text-white">
                   <h3 className="text-sm md:text-base font-bold leading-tight">{category.title}</h3>
                   <p className="text-xs opacity-90">{category.subtitle}</p>
@@ -397,14 +499,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Offers Section */}
-      <section className="section-padding py-6 bg-muted/30">
+      {/* Offers Section with glass cards */}
+      <section className="section-padding py-6 bg-background/50 backdrop-blur-sm">
         <div className="container-max">
           <h3 className="text-lg font-bold text-foreground mb-4">OFFERS FOR YOU</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:bg-card/90 transition-all">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-primary/30">
                   <span className="text-lg">🎁</span>
                 </div>
                 <div>
@@ -413,9 +515,9 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:bg-card/90 transition-all">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-primary/30">
                   <span className="text-lg">🚚</span>
                 </div>
                 <div>
@@ -442,66 +544,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
-        <div className="container-max section-padding">
-          <div className="flex items-center justify-around py-2 relative">
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 text-foreground hover:text-primary min-w-[60px]"
-            >
-              <Home className="w-5 h-5" />
-              <span className="text-xs font-medium">Home</span>
-            </Button>
+      {/* Floating Navigation */}
+      <FloatingNavigation onQRScannerOpen={() => setIsQRScannerOpen(true)} onCartOpen={() => setIsCartOpen(true)} />
 
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary min-w-[60px]"
-              onClick={() => router.push("/categories")}
-            >
-              <Grid3X3 className="w-5 h-5" />
-              <span className="text-xs font-medium">Categories</span>
-            </Button>
-
-            <div className="relative -top-6">
-              <Button
-                size="lg"
-                className="rounded-full h-16 w-16 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
-                onClick={() => setIsQRScannerOpen(true)}
-              >
-                <QrCode className="w-8 h-8" />
-              </Button>
-            </div>
-
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary relative min-w-[60px]"
-              onClick={() => setIsCartOpen(true)}
-            >
-              <div className="relative">
-                <ShoppingCart className="w-5 h-5" />
-                {totalCartItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center p-0">
-                    {totalCartItems}
-                  </Badge>
-                )}
-              </div>
-              <span className="text-xs font-medium">Cart</span>
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary min-w-[60px]"
-              onClick={() => router.push("/profile")}
-            >
-              <User className="w-5 h-5" />
-              <span className="text-xs font-medium">Profile</span>
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      <div className="h-20" />
+      {/* Add bottom padding to account for floating nav */}
+      <div className="h-24" />
 
       {/* Cart Sidebar */}
       <CartSidebar
@@ -521,6 +568,19 @@ export default function HomePage() {
         onClose={() => setIsQRScannerOpen(false)}
         onScanResult={(qrCode) => console.log("QR Code scanned:", qrCode)}
       />
+
+      {/* Footer */}
+      <footer className="bg-muted/30 backdrop-blur-sm border-t border-border/50 mt-12">
+        <div className="container-max section-padding py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <p className="text-foreground font-medium">Developed by Code_Knights</p>
+              <p className="text-muted-foreground text-sm">Smart India Hackathon 2025</p>
+            </div>
+              {/* Removed Trusted by 10,000+ users and Award Winning */}
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

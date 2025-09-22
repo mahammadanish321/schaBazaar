@@ -9,7 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, ArrowLeft, Leaf, AlertCircle } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Eye, EyeOff, ArrowLeft, Leaf, AlertCircle, MapPin } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
@@ -20,6 +22,14 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+  })
+  const [showAddressForm, setShowAddressForm] = useState(false)
+  const [addressData, setAddressData] = useState({
+    street: "",
+    city: "",
+    state: "",
+    pincode: "",
+    type: "Home",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -60,6 +70,7 @@ export default function LoginPage() {
         mobile: "9876543210",
         isVerified: true,
         createdAt: new Date().toISOString(),
+        address: showAddressForm ? addressData : null,
       }
       login(userData)
       setIsLoading(false)
@@ -72,11 +83,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md animate-fade-in-up">
         <div className="text-center mb-8">
           <Link
-            href="/"
+            href="/get-started"
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">Back to Home</span>
+            <span className="text-sm font-medium">Back to Get Started</span>
           </Link>
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
@@ -87,7 +98,7 @@ export default function LoginPage() {
           <p className="text-muted-foreground text-sm">Welcome back to your agricultural marketplace</p>
         </div>
 
-        <Card className="card-modern border-2">
+        <Card className="glass-card border-2 border-border/50">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl font-semibold">Sign In</CardTitle>
             <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -147,6 +158,94 @@ export default function LoginPage() {
                   <div className="flex items-center gap-1 text-destructive text-xs">
                     <AlertCircle className="w-3 h-3" />
                     {errors.password}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="address"
+                    checked={showAddressForm}
+                    onCheckedChange={(checked) => setShowAddressForm(checked as boolean)}
+                  />
+                  <Label htmlFor="address" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Add delivery address (optional)
+                  </Label>
+                </div>
+
+                {showAddressForm && (
+                  <div className="space-y-3 p-4 bg-muted/30 rounded-lg border border-border/30">
+                    <div>
+                      <Label htmlFor="addressType" className="text-sm">
+                        Address Type
+                      </Label>
+                      <Select
+                        value={addressData.type}
+                        onValueChange={(value) => setAddressData({ ...addressData, type: value })}
+                      >
+                        <SelectTrigger className="mt-1 h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Home">Home</SelectItem>
+                          <SelectItem value="Office">Office</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="street" className="text-sm">
+                        Street Address
+                      </Label>
+                      <Textarea
+                        id="street"
+                        placeholder="Enter your street address"
+                        value={addressData.street}
+                        onChange={(e) => setAddressData({ ...addressData, street: e.target.value })}
+                        className="mt-1 min-h-[60px]"
+                        rows={2}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="city" className="text-sm">
+                          City
+                        </Label>
+                        <Input
+                          id="city"
+                          placeholder="City"
+                          value={addressData.city}
+                          onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
+                          className="mt-1 h-10"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state" className="text-sm">
+                          State
+                        </Label>
+                        <Input
+                          id="state"
+                          placeholder="State"
+                          value={addressData.state}
+                          onChange={(e) => setAddressData({ ...addressData, state: e.target.value })}
+                          className="mt-1 h-10"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="pincode" className="text-sm">
+                        Pincode
+                      </Label>
+                      <Input
+                        id="pincode"
+                        placeholder="Enter pincode"
+                        value={addressData.pincode}
+                        onChange={(e) => setAddressData({ ...addressData, pincode: e.target.value })}
+                        className="mt-1 h-10"
+                      />
+                    </div>
                   </div>
                 )}
               </div>

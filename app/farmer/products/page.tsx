@@ -189,8 +189,10 @@ export default function FarmerProductsPage() {
   }
 
   const handleUpdateProduct = () => {
-    if (editingProduct) {
-      setProducts(products.map((p) => (p.id === editingProduct.id ? editingProduct : p)))
+    if (editingProduct && typeof editingProduct.id !== "undefined") {
+      setProducts(products.map((p) =>
+        p.id === editingProduct.id ? { ...p, ...editingProduct } : p
+      ))
       setEditingProduct(null)
     }
   }
@@ -517,6 +519,15 @@ export default function FarmerProductsPage() {
                                   <Download className="h-4 w-4" />
                                 </Button>
                               )}
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => router.push(`/product-tracking/${product.id}`)}
+                                  className="text-green-700 border-green-600 hover:bg-green-50"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Track Product
+                                </Button>
                               <Button variant="ghost" size="sm" onClick={() => handleToggleActive(product.id)}>
                                 {product.active ? "Deactivate" : "Activate"}
                               </Button>
