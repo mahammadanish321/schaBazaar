@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Tracking</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    header {
+      width: 100%;
+      background: #2a9d8f;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    header h1 {
+      font-size: 1.4em;
+    }
+
+    .product-id {
+      margin-top: 15px;
+      background: #e9c46a;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #333;
+      text-align: center;
+    }
+
+    .tracker {
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .step:last-child {
+      margin-bottom: 0;
+    }
+
+    .circle {
+      min-width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2a9d8f;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1rem;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+
+    .line {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      width: 3px;
+      height: calc(100% - 40px);
+      background: #ccc;
+      z-index: 1;
+    }
+
+    .content {
+      margin-left: 60px;
+      background: #f9f9f9;
+      padding: 12px 16px;
+      border-radius: 10px;
+      flex: 1;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .content:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
+    }
+
+    .content h3 {
+      margin-bottom: 6px;
+      font-size: 1.1em;
+      color: #2a2a2a;
+    }
+
+    .content p {
+      margin: 3px 0;
+      font-size: 0.95em;
+      color: #555;
+    }
+
+    .download-btn {
+      margin: 20px 0;
+      padding: 10px 20px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .download-btn:hover {
+      background: #21867a;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.1em;
+      }
+
+      .circle {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+
+      .content {
+        margin-left: 50px;
+        padding: 10px 12px;
+      }
+
+      .content h3 {
+        font-size: 1em;
+      }
+
+      .content p {
+        font-size: 0.85em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header id="header-section">
+    <img src="Picsart_25-09-01_08-56-48-954.png" alt="Company Logo" id="company-logo">
+    <h1>Product Tracking System by SachaBazaar</h1>
+  </header>
+
+  <!-- Unique Product ID -->
+  <div id="product-id" class="product-id">Product ID: <span>#POTATO12345</span></div>
+
+  <div id="tracking-content" class="tracker">
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="circle">1</div>
+      <div class="line"></div>
+      <div class="content">
+        <h3>Farmer (Ram Prasad)</h3>
+        <h4>id: FMR123456</h4>
+        <p>Status: Sold to Aggregator</p>
+        <p>Sell Price: ₹1000</p>
+        <p>Product: Potato</p>
+        <p>Place: Uttar Pradesh</p>
+        <p>Time: 2 days ago</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="circle">2</div>
+      <div class="line"></div>
+      <div class="content">
+        <h3>Aggregator (Ravi Kumar)</h3>
+        <h4>id: AGG654321</h4>
+        <p>Status: Selling is pending</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Button -->
+  <button class="download-btn" onclick="downloadPDF()">Download PDF</button>
+
+  <!-- JS Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+
+      // Capture header with logo
+      const header = document.getElementById("header-section");
+      const headerCanvas = await html2canvas(header);
+      const headerImg = headerCanvas.toDataURL("image/png");
+      const headerProps = pdf.getImageProperties(headerImg);
+      const headerHeight = (headerProps.height * (pageWidth - 20)) / headerProps.width;
+      pdf.addImage(headerImg, "PNG", 10, 10, pageWidth - 20, headerHeight);
+
+      // Capture Product ID
+      const productId = document.getElementById("product-id");
+      const productCanvas = await html2canvas(productId);
+      const productImg = productCanvas.toDataURL("image/png");
+      const productProps = pdf.getImageProperties(productImg);
+      const productHeight = (productProps.height * (pageWidth - 20)) / productProps.width;
+      pdf.addImage(productImg, "PNG", 10, headerHeight + 20, pageWidth - 20, productHeight);
+
+      // Capture Tracking Content
+      const content = document.getElementById("tracking-content");
+      const contentCanvas = await html2canvas(content);
+      const contentImg = contentCanvas.toDataURL("image/png");
+      const contentProps = pdf.getImageProperties(contentImg);
+      const contentHeight = (contentProps.height * (pageWidth - 20)) / contentProps.width;
+
+      pdf.addImage(contentImg, "PNG", 10, headerHeight + productHeight + 30, pageWidth - 20, contentHeight);
+
+      // Save PDF
+      pdf.save("Product_Tracking.pdf");
+    }
+  </script>
+
+</body>
+</html>
