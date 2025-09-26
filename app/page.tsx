@@ -259,63 +259,63 @@ export default function HomePage() {
       {/* Header with glass effect */}
       <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl border-b border-border/50">
         <div className="container-max section-padding">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-3">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-lg font-bold text-foreground">SacchaBazaar</h1>
+                <h1 className="text-lg font-bold text-foreground truncate">SacchaBazaar</h1>
                 {user && (
                   <Badge
                     variant="secondary"
-                    className="text-xs capitalize bg-primary/10 text-primary border-primary/20"
+                    className="text-xs capitalize bg-primary/10 text-primary border-primary/20 flex-shrink-0"
                   >
                     {user.userType}
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">
                   {serviceType === "quick" ? "Delivery in 20 minutes" : "Schedule your delivery"}
                 </span>
                 <div className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
-                  <MapPin className="w-3 h-3" />
-                  <span>Baruipur Station Road</span>
-                  <ChevronDown className="w-3 h-3" />
+                  <MapPin className="w-3 h-3 flex-shrink-0" />
+                  <span className="truncate">Baruipur Station Road</span>
+                  <ChevronDown className="w-3 h-3 flex-shrink-0" />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="flex items-center bg-muted/50 rounded-lg p-1 mr-2">
+            <div className="flex items-center justify-between sm:justify-end gap-2">
+              <div className="flex items-center bg-muted/50 rounded-lg p-1">
                 <Button
                   variant={serviceType === "quick" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setServiceType("quick")}
-                  className={`h-8 px-3 text-xs font-medium transition-all ${
+                  className={`h-8 px-2 sm:px-3 text-xs font-medium transition-all ${
                     serviceType === "quick"
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                   }`}
                 >
                   <Zap className="w-3 h-3 mr-1" />
-                  Quick
+                  <span className="hidden xs:inline">Quick</span>
                 </Button>
                 <Button
                   variant={serviceType === "schedule" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setServiceType("schedule")}
-                  className={`h-8 px-3 text-xs font-medium transition-all ${
+                  className={`h-8 px-2 sm:px-3 text-xs font-medium transition-all ${
                     serviceType === "schedule"
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                   }`}
                 >
                   <Clock className="w-3 h-3 mr-1" />
-                  Schedule
+                  <span className="hidden xs:inline">Schedule</span>
                 </Button>
               </div>
 
               {user ? (
-                <>
+                <div className="flex items-center gap-1">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -349,7 +349,7 @@ export default function HomePage() {
                       <Plus className="w-4 h-4" />
                     </Button>
                   )}
-                </>
+                </div>
               ) : (
                 <Link href="/auth/login">
                   <Button size="sm" className="btn-primary">
@@ -531,12 +531,12 @@ export default function HomePage() {
       </section>
 
       {/* Products Section */}
-      <section className="section-padding py-6">
-        <div className="container-max">
+      <section className="px-2 md:px-4 xl:px-6 py-6">
+        <div className="max-w-7xl mx-auto">
           <h3 className="text-lg font-bold text-foreground mb-4">
             {selectedCategory === "all" ? "Bestsellers" : categories.find((c) => c.id === selectedCategory)?.name}
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 xl:gap-4">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
             ))}

@@ -65,69 +65,69 @@ export function FloatingNavigation({ onQRScannerOpen, onCartOpen }: FloatingNavi
 
   return (
     <nav
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+      className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
         isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
       }`}
     >
-      <div className="bg-background/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl px-2 py-2">
-        <div className="flex items-center justify-center gap-1">
+      <div className="bg-background/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl px-1 py-1 sm:px-2 sm:py-2">
+        <div className="flex items-center justify-center gap-0.5 sm:gap-1">
           <Button
             variant="ghost"
             size="icon"
-            className="flex flex-col items-center gap-1 text-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 transition-all duration-200"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 text-foreground hover:text-primary hover:bg-primary/10 rounded-lg sm:rounded-xl h-12 w-12 sm:h-14 sm:w-14 transition-all duration-200"
             onClick={() => router.push("/")}
           >
-            <Home className="w-5 h-5" />
-            <span className="text-xs font-medium">Home</span>
+            <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="text-[10px] sm:text-xs font-medium">Home</span>
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 transition-all duration-200"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg sm:rounded-xl h-12 w-12 sm:h-14 sm:w-14 transition-all duration-200"
             onClick={() => router.push("/categories")}
           >
-            <Grid3X3 className="w-5 h-5" />
-            <span className="text-xs font-medium">Categories</span>
+            <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="text-[10px] sm:text-xs font-medium">Categories</span>
           </Button>
 
           {/* QR Scanner - Regular button style */}
           <Button
             variant="ghost"
             size="icon"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 transition-all duration-200"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg sm:rounded-xl h-12 w-12 sm:h-14 sm:w-14 transition-all duration-200"
             onClick={handleQRScannerClick}
             title="Scan QR Code - Camera access required"
           >
-            <QrCode className="w-5 h-5" />
-            <span className="text-xs font-medium">Scan QR</span>
+            <QrCode className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="text-[10px] sm:text-xs font-medium">Scan QR</span>
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 relative transition-all duration-200"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg sm:rounded-xl h-12 w-12 sm:h-14 sm:w-14 relative transition-all duration-200"
             onClick={onCartOpen}
           >
             <div className="relative">
-              <ShoppingCart className="w-5 h-5" />
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
               {totalCartItems > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center p-0">
+                <Badge className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold flex items-center justify-center p-0">
                   {totalCartItems}
                 </Badge>
               )}
             </div>
-            <span className="text-xs font-medium">Cart</span>
+            <span className="text-[10px] sm:text-xs font-medium">Cart</span>
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 transition-all duration-200"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg sm:rounded-xl h-12 w-12 sm:h-14 sm:w-14 transition-all duration-200"
             onClick={() => router.push("/profile")}
           >
-            <User className="w-5 h-5" />
-            <span className="text-xs font-medium">Profile</span>
+            <User className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="text-[10px] sm:text-xs font-medium">Profile</span>
           </Button>
         </div>
       </div>

@@ -83,25 +83,26 @@ export default function GetStartedPage() {
 			{/* Content */}
 			<div className="relative z-10 min-h-screen flex flex-col">
 				{/* Header */}
-				<header className="p-6 flex items-center justify-between">
+				<header className="p-4 sm:p-6 flex items-center justify-between">
 					<div className="flex items-center gap-2">
-						<h1 className="text-2xl font-bold text-white">SacchaBazaar</h1>
-						<Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+						<h1 className="text-xl sm:text-2xl font-bold text-white">SacchaBazaar</h1>
+						<Badge variant="secondary" className="bg-white/20 text-white border-white/30 hidden sm:inline-flex">
 							Agricultural Marketplace
 						</Badge>
 					</div>
 
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2 sm:gap-3">
 						<Link href="/auth/login">
 							<Button
+								size="sm"
 								variant="outline"
-								className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+								className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm px-3 py-2 text-sm"
 							>
 								Sign In
 							</Button>
 						</Link>
 						<Link href="/auth/register">
-							<Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Sign Up</Button>
+							<Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-2 text-sm">Sign Up</Button>
 						</Link>
 					</div>
 				</header>
