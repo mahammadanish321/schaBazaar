@@ -25,11 +25,16 @@ export const metadata: Metadata = {
   description: "Connect farmers, aggregators, and customers in a seamless agricultural marketplace",
   keywords: "agriculture, marketplace, farmers, organic, fresh produce",
   authors: [{ name: "SacchaBazaar Team" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   generator: "v0.app",
   icons: {
     icon: "/favicon.ico",
   },
+}
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({
