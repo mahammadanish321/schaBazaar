@@ -91,19 +91,17 @@ export function FloatingNavigation({ onQRScannerOpen, onCartOpen }: FloatingNavi
             <span className="text-xs font-medium">Categories</span>
           </Button>
 
-          {/* QR Scanner - Center elevated button with enhanced styling */}
-          <div className="relative -top-4 mx-2">
-            <Button
-              size="lg"
-              className="rounded-full h-16 w-16 bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl hover:shadow-3xl transition-all duration-200 hover:scale-105 animate-float"
-              onClick={handleQRScannerClick}
-              title="Scan QR Code - Camera access required"
-            >
-              <QrCode className="w-8 h-8" />
-            </Button>
-            {/* Pulse animation for QR button */}
-            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
-          </div>
+          {/* QR Scanner - Regular button style */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl h-14 w-14 transition-all duration-200"
+            onClick={handleQRScannerClick}
+            title="Scan QR Code - Camera access required"
+          >
+            <QrCode className="w-5 h-5" />
+            <span className="text-xs font-medium">Scan QR</span>
+          </Button>
 
           <Button
             variant="ghost"
