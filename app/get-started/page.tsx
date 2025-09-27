@@ -87,7 +87,7 @@ export default function GetStartedPage() {
 					<div className="flex items-center gap-2">
 						<h1 className="text-xl sm:text-2xl font-bold text-white">SacchaBazaar</h1>
 						<Badge variant="secondary" className="bg-white/20 text-white border-white/30 hidden sm:inline-flex">
-							Agricultural Marketplace
+							Agricultural Marketplace 
 						</Badge>
 					</div>
 
@@ -117,7 +117,7 @@ export default function GetStartedPage() {
 							</h2>
 							<p className="text-xl md:text-2xl text-white/90 mb-8 text-pretty max-w-2xl mx-auto">
 								Connect with local farmers, get the freshest produce, and support sustainable agriculture with
-								transparent pricing
+								transparent and Fair pricing
 							</p>
 						</div>
 
